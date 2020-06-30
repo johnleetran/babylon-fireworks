@@ -46,6 +46,12 @@ module GAME{
                             case "a": // passt
                             case "A":
                                 console.log('a');
+                                BABYLON.ParticleHelper.CreateAsync("explosion", scene).then((set) => {
+                                    set.systems.forEach(s => {
+                                        s.disposeOnStop = true;
+                                    });
+                                    set.start();
+                                });
                                 break;                        
                             case "d": // passt
                             case "D":
@@ -68,8 +74,8 @@ module GAME{
 
         private createSphere(){
             let scene = this._scene;
-            var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter:.5}, this._scene);
-            sphere.position.x = this.randomInt(-25, 25);
+            var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter:.25}, this._scene);
+            sphere.position.x = this.randomInt(-20, 20);
 
             // give sphere a color
             var myMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
@@ -80,12 +86,58 @@ module GAME{
             sphere.material = myMaterial;
 
             // attach particles to sphere
+            this.attachParticleSystem(sphere);
+
+            //make sphere move
+            var i = 0;
+            var direction = new BABYLON.Vector3(0, this.randomFloatUnderOne(), 0);
+            direction.normalize();
+            let distance = 0.1;
+            var explosionSphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter:.01}, scene);
+
+            scene.registerAfterRender( () => {
+                var particleSystem = new BABYLON.ParticleSystem("particles", 20, scene);
+                let fireworkLifetime = this.randomInt(100,250);
+                if(i++ < fireworkLifetime) {
+                    sphere.translate(direction, distance, BABYLON.Space.WORLD);
+                }else if(i++ < fireworkLifetime + 150){
+                    //Texture of each particle
+                    particleSystem.particleTexture = new BABYLON.Texture("flare.png", scene);
+                    // Where the particles come from
+                    particleSystem.emitter = explosionSphere; //new BABYLON.Vector3(0, 0, 0); // the starting object, the emitter
+                    particleSystem.minEmitBox = new BABYLON.Vector3(-0.2, -0.2, -0.2); // Starting all from
+                    particleSystem.maxEmitBox = new BABYLON.Vector3(0.2, 0.2, 0.2); // To...
+                    particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
+
+                    particleSystem.emitRate = 200;
+
+                    // Size of each particle (random between...
+                    particleSystem.minSize = 0.5;
+                    particleSystem.maxSize = 0.9;
+
+                    // Life time of each particle (random between...
+                    particleSystem.minLifeTime = 0.2;
+                    particleSystem.maxLifeTime = 0.6;
+
+                    explosionSphere.position = sphere.position;
+                    sphere.scaling = new BABYLON.Vector3(1.25,1.25,1.25);
+                    sphere.dispose();
+                    particleSystem.start();
+                }else{
+                    explosionSphere.dispose();
+                    particleSystem.stop();
+                }
+            });
+        }
+
+        private attachParticleSystem(mesh: BABYLON.Mesh){
+            let scene =this._scene;
             var particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
             //Texture of each particle
             particleSystem.particleTexture = new BABYLON.Texture("flare.png", scene);
 
             // Where the particles come from
-            particleSystem.emitter =sphere; //new BABYLON.Vector3(0, 0, 0); // the starting object, the emitter
+            particleSystem.emitter = mesh; //new BABYLON.Vector3(0, 0, 0); // the starting object, the emitter
             particleSystem.minEmitBox = new BABYLON.Vector3(-0.2, -0.2, -0.2); // Starting all from
             particleSystem.maxEmitBox = new BABYLON.Vector3(0.2, 0.2, 0.2); // To...
 
@@ -120,24 +172,19 @@ module GAME{
             particleSystem.maxEmitPower = 3;
             particleSystem.updateSpeed = 0.005;
             particleSystem.start();
-
-            //make sphere move
-            var i = 0;
-            var direction = new BABYLON.Vector3(0, 1, 0);
-            direction.normalize();
-            let distance = 0.1;
-            scene.registerAfterRender(function () {
-              if(i++<200) {
-                sphere.translate(direction, distance, BABYLON.Space.WORLD);
-              }else{
-                sphere.dispose();
-              }
-            });
-
         }
 
         private randomInt(min: number, max: number){
             return Math.floor(Math.random() * (max - min) ) + min;
+        }
+
+        private randomFloatUnderOnePositiveOrNegative(){
+            var tmp = this.randomInt(0,2)
+            var sign = 1;
+            if(tmp === 1) {
+                sign = -1
+            }
+            return this.randomFloatUnderOne() * sign;
         }
 
         private randomFloatUnderOne(){
