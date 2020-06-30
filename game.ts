@@ -34,6 +34,9 @@ module GAME{
             //init key presses event
             this.initKeyPressEvent();
 
+            //debug
+            scene.debugLayer.show();
+
         }
 
         private initKeyPressEvent(){
@@ -96,7 +99,7 @@ module GAME{
             var explosionSphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter:.01}, scene);
 
             scene.registerAfterRender( () => {
-                var particleSystem = new BABYLON.ParticleSystem("particles", 20, scene);
+                var particleSystem = new BABYLON.ParticleSystem("particles", 1, scene);
                 let fireworkLifetime = this.randomInt(100,250);
                 if(i++ < fireworkLifetime) {
                     sphere.translate(direction, distance, BABYLON.Space.WORLD);
@@ -109,7 +112,7 @@ module GAME{
                     particleSystem.maxEmitBox = new BABYLON.Vector3(0.2, 0.2, 0.2); // To...
                     particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
 
-                    particleSystem.emitRate = 200;
+                    particleSystem.emitRate = 20;
 
                     // Size of each particle (random between...
                     particleSystem.minSize = 0.5;
