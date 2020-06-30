@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode production --config prod.config.js",
     "watch": "webpack --mode development --watch"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "babylonjs": "^4.1.0",
+    "copy-webpack-plugin": "^6.0.3",
     "ts-loader": "^7.0.5",
     "typescript": "^3.9.5",
     "webpack": "^4.43.0",
