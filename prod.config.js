@@ -1,6 +1,6 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
-let outputDirectory = path.resolve(__dirname, 'dist')
+let outputDirectory = path.resolve(__dirname, 'docs')
 module.exports = {
     entry:  './game.ts',
     output: {
