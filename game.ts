@@ -23,7 +23,7 @@ module GAME{
             this.initLights();
 
             // Add and manipulate meshes in the scene
-            var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter:1}, this._scene);
+            //var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter:1}, this._scene);
             
             // helper lines to show axis
             this.showAxis();
@@ -79,9 +79,10 @@ module GAME{
             let scene = this._scene;
             var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter:.25}, this._scene);
             sphere.position.x = this.randomInt(-20, 20);
-
+            sphere.convertToUnIndexedMesh();
+            sphere.cullingStrategy = BABYLON.AbstractMesh.CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY;
             // give sphere a color
-            var myMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
+            var myMaterial = new BABYLON.StandardMaterial("sphereMaterial", scene);
             myMaterial.diffuseColor =  new BABYLON.Color3(this.randomFloatUnderOne(), this.randomFloatUnderOne(), this.randomFloatUnderOne());
             myMaterial.specularColor = new BABYLON.Color3(this.randomFloatUnderOne(), this.randomFloatUnderOne(), this.randomFloatUnderOne());
             myMaterial.emissiveColor = new BABYLON.Color3(this.randomFloatUnderOne(), this.randomFloatUnderOne(), this.randomFloatUnderOne());
@@ -89,25 +90,26 @@ module GAME{
             sphere.material = myMaterial;
 
             // attach particles to sphere
-            this.attachParticleSystem(sphere);
+            var particleSystem = this.attachParticleSystem(sphere);
 
             //make sphere move
             var i = 0;
             var direction = new BABYLON.Vector3(0, this.randomFloatUnderOne(), 0);
             direction.normalize();
             let distance = 0.1;
-            var explosionSphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter:.01}, scene);
 
             scene.registerAfterRender( () => {
-                var particleSystem = new BABYLON.ParticleSystem("particles", 1, scene);
+                //var particleSystem = new BABYLON.ParticleSystem("particles", 1, scene);
+                //var explosionSphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 2.5 }, scene);
+
                 let fireworkLifetime = this.randomInt(100,250);
                 if(i++ < fireworkLifetime) {
                     sphere.translate(direction, distance, BABYLON.Space.WORLD);
                 }else if(i++ < fireworkLifetime + 150){
                     //Texture of each particle
-                    particleSystem.particleTexture = new BABYLON.Texture("flare.png", scene);
+                    //particleSystem.particleTexture = new BABYLON.Texture("flare.png", scene);
                     // Where the particles come from
-                    particleSystem.emitter = explosionSphere; //new BABYLON.Vector3(0, 0, 0); // the starting object, the emitter
+                    particleSystem.emitter = sphere; //new BABYLON.Vector3(0, 0, 0); // the starting object, the emitter
                     particleSystem.minEmitBox = new BABYLON.Vector3(-0.2, -0.2, -0.2); // Starting all from
                     particleSystem.maxEmitBox = new BABYLON.Vector3(0.2, 0.2, 0.2); // To...
                     particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
@@ -122,13 +124,13 @@ module GAME{
                     particleSystem.minLifeTime = 0.2;
                     particleSystem.maxLifeTime = 0.6;
 
-                    explosionSphere.position = sphere.position;
-                    sphere.scaling = new BABYLON.Vector3(1.25,1.25,1.25);
-                    sphere.dispose();
+                    // explosionSphere.position = sphere.position;
+
                     particleSystem.start();
                 }else{
-                    explosionSphere.dispose();
-                    particleSystem.stop();
+                    sphere.dispose();
+                    sphere.material?.dispose();
+                    //particleSystem.stop();
                 }
             });
         }
@@ -175,6 +177,7 @@ module GAME{
             particleSystem.maxEmitPower = 3;
             particleSystem.updateSpeed = 0.005;
             particleSystem.start();
+            return particleSystem;
         }
 
         private randomInt(min: number, max: number){
