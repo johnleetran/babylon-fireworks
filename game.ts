@@ -127,12 +127,16 @@ module GAME{
                     // explosionSphere.position = sphere.position;
                     particleSystem.start();
                 }else{
-                    // this.createFireworksExplosion(sphere.clone());
+                    if(!sphere.isDisposed()){
+                        this.createFireworksExplosion(sphere.clone());
+                        particleSystem.stop();
+                    }
                     sphere.dispose();
                     sphere.material?.dispose();
-                    //particleSystem.stop();
+                    
                 }
             });
+
         }
 
         private createFireworksExplosion(sphere : BABYLON.Mesh){
