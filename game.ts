@@ -43,9 +43,24 @@ module GAME{
             //place a building in the scene
             this.initBuilding();
 
+            //create skybox
+            this.initSkybox();
+
             //debug
             scene.debugLayer.show();
 
+        }
+
+        private initSkybox(){
+            let scene = this._scene;
+            // Skybox
+            var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 500.0 }, scene);
+            var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+            skyboxMaterial.backFaceCulling = false;
+            skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/skybox2", scene);
+            skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+            skyboxMaterial.disableLighting = true;
+            skybox.material = skyboxMaterial;	
         }
 
         private initBuilding() {
