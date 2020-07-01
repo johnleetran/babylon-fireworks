@@ -27,6 +27,7 @@ module.exports = {
             patterns: [
                 { from: 'index.html', to: `${outputDirectory}/index.html` },
                 { from: 'flare.png', to: `${outputDirectory}/flare.png` },
+                { from: 'building.glb', to: `${outputDirectory}/building.glb` },
             ],
         }),
     ],
