@@ -1,4 +1,5 @@
 import * as BABYLON from 'babylonjs';
+import 'babylonjs-loaders';
 
 module GAME{
     export class Game{
@@ -39,9 +40,31 @@ module GAME{
             //createSphereOnTimer
             this.createSphereOnTimer();
 
+            //place a building in the scene
+            this.initBuilding();
+
             //debug
             scene.debugLayer.show();
 
+        }
+
+        private initBuilding() {
+            let alpha = 0.0;
+            let orbit_radius = 20;
+            BABYLON.SceneLoader.LoadAssetContainer("./", "building.glb", this._scene, (container) => {
+
+                //var mesh = BABYLON.Mesh.MergeMeshes(container.meshes as BABYLON.Mesh[]);
+                //container.addAllToScene();
+                container.instantiateModelsToScene(name => "p" + name, true)
+                let mesh = this._scene.getMeshByName("p__root__");
+                if (mesh) {
+                    mesh.position = new BABYLON.Vector3(0, -100, -130);
+                    mesh.scaling = new BABYLON.Vector3(10, 10, 10);
+                    //mesh.rotate ( new BABYLON.Vector3(0, 1, 0, ), 90);
+                }
+                //container.addAllToScene();
+                this._scene.addMesh(mesh as BABYLON.Mesh);
+            });
         }
 
         private initKeyPressEvent(){
