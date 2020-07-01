@@ -6,8 +6,10 @@ module GAME{
         private _canvas: HTMLCanvasElement;
 		private _engine: BABYLON.Engine;
         private _scene: BABYLON.Scene;
-        private _camera: BABYLON.Camera;
+        private _camera: BABYLON.FollowCamera;
 
+        private _newest_mesh!: BABYLON.Mesh;
+        
         constructor(){
             var canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
             var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
@@ -34,6 +36,9 @@ module GAME{
             //init key presses event
             this.initKeyPressEvent();
 
+            //createSphereOnTimer
+            this.createSphereOnTimer();
+
             //debug
             scene.debugLayer.show();
 
@@ -59,6 +64,7 @@ module GAME{
                             case "d": // passt
                             case "D":
                                 console.log('d');
+                                this._camera.lockedTarget = this._newest_mesh;
                                 break;
                             case "w": // passt
                             case "W":
@@ -78,6 +84,10 @@ module GAME{
         private createSphere(){
             let scene = this._scene;
             var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter:.25}, this._scene);
+
+            this._newest_mesh = sphere;
+            this._camera.lockedTarget = this._newest_mesh;
+
             sphere.position.x = this.randomInt(-20, 20);
             sphere.convertToUnIndexedMesh();
             sphere.cullingStrategy = BABYLON.AbstractMesh.CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY;
@@ -133,7 +143,6 @@ module GAME{
                     }
                     sphere.dispose();
                     sphere.material?.dispose();
-                    
                 }
             });
 
@@ -210,11 +219,16 @@ module GAME{
                     m1.setFloat!("b", b);
                     m1.setFloat!("time", time);
                     time += 0.1;
+                    this._newest_mesh = sphere;
                 } else {
                     shaderMaterial.dispose();
                     sphere.material?.dispose();
                     sphere.dispose();
                 }
+                // if(time >= 8){
+                //     //if (this._newest_mesh && !this._newest_mesh.isDisposed()){
+                //     //}
+                // }
             });
         }
 
@@ -281,13 +295,49 @@ module GAME{
         }
 
 
-        private initCamera(){
-            // Add a camera to the scene and attach it to the canvas
-            var camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(0, 0, -50), this._scene);
-            //var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, new BABYLON.Vector3(0,0,5), this._scene);
+        private initCamera() {
+            // This creates a basic Babylon Scene object (non-mesh)
+            let scene = this._scene;
+            /********** FOLLOW CAMERA EXAMPLE **************************/
+
+            // This creates and initially positions a follow camera 	
+            //var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 10, new BABYLON.Vector3(0, 0, 0), scene);
+            var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(0, 10, -10), scene);
+
+            //The goal distance of camera from target
+            camera.radius = 30;
+
+            // The goal height of camera above local origin (centre) of target
+            camera.heightOffset = 10;
+
+            // The goal rotation of camera around local origin (centre) of target in x y plane
+            camera.rotationOffset = 0;
+
+            //Acceleration of camera in moving from current to goal position
+            camera.cameraAcceleration = 0.005
+
+            //The speed at which acceleration is halted 
+            camera.maxCameraSpeed = 10
+
+            //camera.target is set after the target's creation
+
+            // This attaches the camera to the canvas
             camera.attachControl(this._canvas, true);
+
+            // // Add a camera to the scene and attach it to the canvas
+            // var camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(0, 0, -50), this._scene);
+            // //var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, new BABYLON.Vector3(0,0,5), this._scene);
+            // camera.attachControl(this._canvas, true);
             return camera;
         }
+
+        // private initCamera(){
+        //     // Add a camera to the scene and attach it to the canvas
+        //     var camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(0, 0, -50), this._scene);
+        //     //var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, new BABYLON.Vector3(0,0,5), this._scene);
+        //     camera.attachControl(this._canvas, true);
+        //     return camera;
+        // }
 
         private initLights(){
             var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), this._scene);
@@ -299,6 +349,13 @@ module GAME{
             window.addEventListener("resize", () => {
                 this._engine.resize();
             });
+        }
+
+        private createSphereOnTimer(){
+            this.createSphere();
+            setInterval( () => { 
+                this.createSphere();
+            }, 5000);
         }
 
         private showAxis(){
