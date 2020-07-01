@@ -125,12 +125,85 @@ module GAME{
                     particleSystem.maxLifeTime = 0.6;
 
                     // explosionSphere.position = sphere.position;
-
+                    this.createFireworksExplosion(sphere);
                     particleSystem.start();
                 }else{
                     sphere.dispose();
                     sphere.material?.dispose();
                     //particleSystem.stop();
+                }
+            });
+        }
+
+        private createFireworksExplosion(sphere : BABYLON.Mesh){
+            let scene = this._scene;
+            BABYLON.Effect.ShadersStore["customVertexShader"] = "\r\n" +
+                "precision highp float;\r\n" +
+
+                "// Attributes\r\n" +
+                "attribute vec3 position;\r\n" +
+                "attribute vec3 normal;\r\n" +
+
+                "// Uniforms\r\n" +
+                "uniform mat4 worldViewProjection;\r\n" +
+                "uniform float time;\r\n" +
+                "uniform float r;\r\n" +
+                "uniform float g;\r\n" +
+                "uniform float b;\r\n" +
+
+                "void main(void) {\r\n" +
+                "    vec3 p = position;\r\n" +
+                "    vec3 j = vec3(0., -1.0, 0.);\r\n" +
+                "    p = p + normal * log2(1. + time) * 2.5;\r\n" +
+                "    gl_Position = worldViewProjection * vec4(p, 1.0);\r\n" +
+                "}\r\n";
+
+            BABYLON.Effect.ShadersStore["customFragmentShader"] = "\r\n" +
+                "precision highp float;\r\n" +
+
+                "uniform float time;\r\n" +
+                "uniform float r;\r\n" +
+                "uniform float g;\r\n" +
+                "uniform float b;\r\n" +
+                
+                "void main(void) {\r\n" +
+                "    gl_FragColor = vec4(r, g, b, 1.0 );\r\n" +
+                "}\r\n";
+
+
+
+            var shaderMaterial = new BABYLON.ShaderMaterial("shader", scene, {
+                vertex: "custom",
+                fragment: "custom",
+            },
+                {
+                    attributes: ["position", "normal", "uv", "color"],
+                    uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"],
+                    needAlphaBlending: true
+                });
+
+
+            shaderMaterial.backFaceCulling = false;
+
+            //var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 1 }, scene);
+            sphere.scaling = new BABYLON.Vector3(2,2,2);
+            sphere.convertToFlatShadedMesh();
+            sphere.material = shaderMaterial;
+            
+            var t = 0.0;
+            var time = 0.0;
+            scene.registerBeforeRender( ()  => {
+                if (time < 8) {
+                    sphere.material.setFloat("position", sphere.position);
+                    sphere.material.setFloat("r", this.randomFloatUnderOne());
+                    sphere.material.setFloat("g", this.randomFloatUnderOne());
+                    sphere.material.setFloat("b", this.randomFloatUnderOne());
+
+                    sphere.material.setFloat("time", time);
+                    time += 0.1;
+                }
+                else {
+                    sphere.dispose();
                 }
             });
         }
