@@ -12,7 +12,7 @@ module GAME{
             var canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
             var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
             var scene = new BABYLON.Scene(engine);
-
+            scene.clearColor = new BABYLON.Color4(0.0, 0.0, 0.0, 1.0);
             this._engine = engine;
             this._canvas = canvas;
             this._scene = scene;
@@ -159,7 +159,7 @@ module GAME{
                     "void main(void) {\r\n" +
                     "    vec3 p = position;\r\n" +
                     "    vec3 j = vec3(0., -1.0, 0.);\r\n" +
-                    "    p = p + normal * log2(1. + time) * 2.5;\r\n" +
+                    "    p = p + normal * log2(1. + time) * 3.5;\r\n" +
                     "    gl_Position = worldViewProjection * vec4(p, 1.0);\r\n" +
                     "}\r\n";
 
@@ -191,7 +191,7 @@ module GAME{
             shaderMaterial.backFaceCulling = false;
 
             //var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 1 }, scene);
-            sphere.scaling = new BABYLON.Vector3(2,2,2);
+            sphere.scaling = new BABYLON.Vector3(10,10,10);
             sphere.convertToFlatShadedMesh();
             sphere.material = shaderMaterial;
             
