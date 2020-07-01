@@ -170,8 +170,6 @@ module GAME{
                 "    gl_FragColor = vec4(r, g, b, 1.0 );\r\n" +
                 "}\r\n";
 
-
-
             var shaderMaterial = new BABYLON.ShaderMaterial("shader", scene, {
                 vertex: "custom",
                 fragment: "custom",
@@ -193,16 +191,19 @@ module GAME{
             var t = 0.0;
             var time = 0.0;
             scene.registerBeforeRender( ()  => {
-                if (time < 8) {
-                    sphere.material.setFloat("position", sphere.position);
-                    sphere.material.setFloat("r", this.randomFloatUnderOne());
-                    sphere.material.setFloat("g", this.randomFloatUnderOne());
-                    sphere.material.setFloat("b", this.randomFloatUnderOne());
+                var r = this.randomFloatUnderOne();
+                var g = this.randomFloatUnderOne();
+                var b = this.randomFloatUnderOne();
 
-                    sphere.material.setFloat("time", time);
+                if (time < 8) {
+                    let m1: any = sphere.material
+                    m1.setFloat!("position", sphere.position);
+                    m1.setFloat!("r", r);
+                    m1.setFloat!("g", g);
+                    m1.setFloat!("b", b);
+                    m1.setFloat!("time", time);
                     time += 0.1;
-                }
-                else {
+                } else {
                     sphere.dispose();
                 }
             });

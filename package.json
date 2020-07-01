@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "babylonjs": "^4.2.0-alpha.23",
+    "babylonjs": "^4.1.0",
     "copy-webpack-plugin": "^6.0.3",
     "ts-loader": "^7.0.5",
     "typescript": "^3.9.5",
