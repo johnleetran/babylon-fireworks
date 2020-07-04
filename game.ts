@@ -46,6 +46,9 @@ module GAME{
             //create skybox
             this.initSkybox();
 
+            //init background music
+            this.initBackgroundMusic();
+
             //debug
             scene.debugLayer.show();
 
@@ -176,8 +179,20 @@ module GAME{
                     particleSystem.start();
                 }else{
                     if(!sphere.isDisposed()){
-                        this.createFireworksExplosion(sphere.clone());
+                        let sphereTmp = sphere.clone();
+                        this.createFireworksExplosion(sphereTmp);
                         particleSystem.stop();
+                        let popSound = new BABYLON.Sound("firework-crackling", "sounds/FireWorks-Single-B.mp3", this._scene, null, {
+                            autoplay: true,
+                            spatialSound: true,
+                            distanceModel: "linear",
+                            maxDistance: 1000,
+                            rolloffFactor: 10
+                        });
+                        popSound.attachToMesh(sphereTmp);
+                        // new BABYLON.Sound("firework-crackling", "sounds/FireWorks-Crackling.mp3", this._scene, null, {
+                        //     autoplay: true
+                        // });
                     }
                     sphere.dispose();
                     sphere.material?.dispose();
@@ -422,6 +437,13 @@ module GAME{
             xLines.color = red;
             yLines.color = green;
             zLines.color = blue;
+        }
+
+        private initBackgroundMusic(){
+            // var music = new BABYLON.Sound("BackgroundMusic", "sounds/background-music.mp3", this._scene, null, {
+            //     loop: true,
+            //     autoplay: true
+            // });
         }
         public runRenderLoop(){
             this._engine.runRenderLoop( () => {

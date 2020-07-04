@@ -2,3 +2,4 @@ node_modules
 game.js
 game.js.map
 !docs/game.js*
+.DS_Store

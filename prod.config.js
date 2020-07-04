@@ -29,6 +29,7 @@ module.exports = {
                 { from: 'flare.png', to: `${outputDirectory}/flare.png` },
                 { from: 'building.glb', to: `${outputDirectory}/building.glb` },
                 { from: 'textures', to: `${outputDirectory}/textures` },
+                { from: 'sounds', to: `${outputDirectory}/sounds` },
 
             ],
         }),
